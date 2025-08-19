@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Покупка звёзд</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      padding: 40px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #0088cc;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #0077b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>⭐ Купить звёзды</h2>
+    <p>Выберите сумму и продолжите оплату.</p>
+    <button onclick="buyStars()">Оплатить</button>
+  </div>
+
+  <script>
+    function buyStars() {
+      Telegram.WebApp.showAlert("Здесь будет логика оплаты ⭐");
+    }
+
+    // Автоматическая настройка темы в Telegram
+    Telegram.WebApp.ready();
+  </script>
+</body>
+</html>
