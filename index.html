@@ -6,9 +6,9 @@
 <style>
 body {
   margin: 0;
-  overflow: hidden;
+
   background: #000000;
-  font-family: Arial, sans-serif;
+  font-family: Impact, sans-serif;
   color: #fff;
 }
 
@@ -19,8 +19,8 @@ body {
   transform: translateX(-50%);
   background: rgba(255,255,255,0.1);
   border-radius: 40px;
-  width: 650px;   /* увеличиваем ширину */
-  height: 700px;  /* можно задать минимальную высоту */
+  width: 65%;   /* увеличиваем ширину */
+  height: auto;  /* можно задать минимальную высоту */
   padding: 40px 60px; /* внутренние отступы */
 
   text-align: center;
@@ -30,7 +30,8 @@ body {
 }
 
 .card h2 {
-  font-size: 60px;
+  font-size: 5vw;
+  max-font-size: 50px;
   margin-bottom: 15px;
 }
 
@@ -47,7 +48,8 @@ body {
   margin: 10px;
   border-radius: 30px;
   cursor: pointer;
-  font-size: 50px;
+  font-size: 5vw;
+  font-family: "Arial Black", sans-serif;
 }
 
 .buttons button:hover {
@@ -60,12 +62,12 @@ body {
   width: 100%; height: 100%;
   pointer-events: none;
   z-index: 15;
-  background: radial-gradient(circle at var(--vx) var(--vy), rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.85) 150%);
+  background: radial-gradient(circle at var(--vx) var(--vy), rgba(255,255,255,0.25) 50%, rgba(0,0,0,1) 100%);
   opacity: 0.4; /* фиксированная яркость */
 }
 @keyframes pulse {
   from { opacity: 0.1; }
-  to   { opacity: 1.9; }
+  to   { opacity: 0.9; }
 }
 
 canvas { display: block; }
@@ -81,9 +83,9 @@ canvas { display: block; }
     <p><button onclick="chooseStars(500)">500 ⭐ |  140руб</button></p>
     <p><button onclick="chooseStars(1000)">1000 ⭐|  140руб</button></p>
   </div>
-  </div>
+</div>
 
-  <script>
+<script>
     // Telegram WebApp
     Telegram.WebApp.ready();
 
