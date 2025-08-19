@@ -18,7 +18,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255,255,255,0.1);
-  border-radius: 20px;
+  border-radius: 40px;
   width: 650px;   /* увеличиваем ширину */
   height: 700px;  /* можно задать минимальную высоту */
   padding: 40px 60px; /* внутренние отступы */
@@ -45,7 +45,7 @@ body {
   color: white;
   padding: 15px 25px;
   margin: 10px;
-  border-radius: 10px;
+  border-radius: 30px;
   cursor: pointer;
   font-size: 50px;
 }
@@ -81,6 +81,18 @@ canvas { display: block; }
     <p><button>500 ⭐ |  140руб</button></p>
     <p><button>1000 ⭐|  140руб</button></p>
   </div>
+  <script>
+function buyStars(amount) {
+  // Если это внутри Telegram Web App
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.sendData(amount.toString());
+    Telegram.WebApp.showAlert(`Вы выбрали ${amount} ⭐`);
+  } else {
+    // В обычном браузере
+    alert(`Вы выбрали ${amount} ⭐`);
+  }
+}
+</script>
 </div>
 
 <div class="vignette"></div>
