@@ -62,7 +62,7 @@ body {
   width: 100%; height: 100%;
   pointer-events: none;
   z-index: 15;
-  background: radial-gradient(circle at var(--vx) var(--vy), rgba(255,255,255,0.25) 50%, rgba(0,0,0,1) 100%);
+  background: radial-gradient(circle at var(--vx) var(--vy), rgba(255,255,255,0.25) 50%, rgba(0,0,0,1) 80%);
   opacity: 0.4; /* фиксированная яркость */
 }
 @keyframes pulse {
@@ -147,7 +147,7 @@ const stars = [];
 for(let i=0;i<40;i++){
   const geometry = createStarGeometry(0.8 + Math.random()*0.5);
   const star = new THREE.Mesh(geometry, goldMaterial);
-  star.position.set(0, 0, 0);
+  star.position.set(0, 20, 0);
   const theta = Math.random() * 2 * Math.PI;
 const phi = Math.random() * Math.PI;
 const speed = 0.2 + Math.random()*0.3;
