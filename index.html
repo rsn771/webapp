@@ -13,20 +13,15 @@ body {
 }
 
 .card {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 90%;
+  max-width: 650px;
+  margin: 80px auto; /* автоматически центрируем и расстояние между окнами */
   background: rgba(255,255,255,0.1);
   border-radius: 40px;
-  width: 65%;   /* увеличиваем ширину */
-  height: auto;  /* можно задать минимальную высоту */
-  padding: 40px 60px; /* внутренние отступы */
-
+  padding: 40px 60px;
   text-align: center;
   backdrop-filter: blur(10px);
   z-index: 20;
-
 }
 
 .card h2 {
@@ -55,13 +50,19 @@ body {
 .buttons button:hover {
   background: #C0C0C0;
 }
-
-.vignette {
+.card.second {
+  top: calc(10% + 700px +20px); /* 10% от верха + высота первого окна + отступ */
+  left: 50%;
+  transform: translateX(-50%);
   position: absolute;
+  z-index: 20; /* такой же, как у первого окна */
+}
+.vignette {
+  position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
   pointer-events: none;
-  z-index: 15;
+  z-index: 5;
   background: radial-gradient(circle at var(--vx) var(--vy), rgba(255,255,255,0.25) 50%, rgba(0,0,0,1) 80%);
   opacity: 0.4; /* фиксированная яркость */
 }
@@ -70,21 +71,64 @@ body {
   to   { opacity: 0.9; }
 }
 
-canvas { display: block; }
+canvas {
+  display: block;
+  position: fixed;   /* фиксируем на весь экран */
+  top: 0;
+  left: 0;
+  z-index: 1;        /* нижний слой */
+}
+
+.vignette {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 5;        /* выше канваса, ниже окон */
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.25) 0%, rgba(0,0,0,1) 70%);
+  opacity: 0.7;
+}
+
+.card {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;       }
 </style>
 </head>
 <body>
 
-<div class="card">
+<div class="card first">
   <h2>⭐ Купить звёзды</h2>
   <p>Выберите количество:</p>
   <div class="buttons">
-    <p><button onclick="chooseStars(100)">100 ⭐ |  140руб</button></p>
-    <p><button onclick="chooseStars(500)">500 ⭐ |  140руб</button></p>
-    <p><button onclick="chooseStars(1000)">1000 ⭐|  140руб</button></p>
+    <p><button onclick="chooseStars(100)">50⭐ |  75руб</button></p>
+    <p><button onclick="chooseStars(500)">100⭐ |  140руб</button></p>
+    <p><button onclick="chooseStars(1000)">500⭐ |  725руб</button></p>
+    <p><button onclick="chooseStars(1000)">1000⭐ |  1350руб</button></p>
   </div>
 </div>
 
+<div class="card second">
+  <h2>Почему именно этот сервис?</h2>
+  <p>Быстро и проверенно</p>
+  <p>Гарантия (по квитанции)</p>
+  <p>В случае ошибок @wlked_game</p>
+</div>
+
+<script>
+const firstCard = document.querySelector('.card.first');
+const secondCard = document.querySelector('.card.second');
+
+function positionSecondCard() {
+  const rect = firstCard.getBoundingClientRect();
+  secondCard.style.top = rect.bottom + 300 + 'px'; // 20px отступ под первым окном
+}
+
+positionSecondCard();
+window.addEventListener('resize', positionSecondCard);
+</script>
 <script>
     // Telegram WebApp
     Telegram.WebApp.ready();
@@ -141,13 +185,13 @@ function createStarGeometry(size=1){
   const extrudeSettings = {depth:0.2, bevelEnabled:true, bevelThickness:0.05, bevelSize:0.05, bevelSegments:1};
   return new THREE.ExtrudeGeometry(shape, extrudeSettings);
 }
-
+const center = new THREE.Vector3(0, 0, 0); // центр сцены, соответствует центру экрана
 // Создаём падающие звезды
 const stars = [];
 for(let i=0;i<40;i++){
   const geometry = createStarGeometry(0.8 + Math.random()*0.5);
   const star = new THREE.Mesh(geometry, goldMaterial);
-  star.position.set(0, 20, 0);
+  star.position.copy(center);
   const theta = Math.random() * 2 * Math.PI;
 const phi = Math.random() * Math.PI;
 const speed = 0.2 + Math.random()*0.3;
