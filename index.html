@@ -14,7 +14,7 @@ body {
 
 .card {
   position: absolute;
-  top: 20%;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255,255,255,0.1);
@@ -83,15 +83,18 @@ canvas { display: block; }
   </div>
   <script>
 function buyStars(amount) {
-  // Если это внутри Telegram Web App
   if (window.Telegram?.WebApp) {
     Telegram.WebApp.sendData(amount.toString());
     Telegram.WebApp.showAlert(`Вы выбрали ${amount} ⭐`);
   } else {
-    // В обычном браузере
     alert(`Вы выбрали ${amount} ⭐`);
   }
 }
+
+// Привязываем кнопки к функции
+document.getElementById('btn100').addEventListener('click', ()=>buyStars(100));
+document.getElementById('btn500').addEventListener('click', ()=>buyStars(500));
+document.getElementById('btn1000').addEventListener('click', ()=>buyStars(1000));
 </script>
 </div>
 
