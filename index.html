@@ -77,18 +77,20 @@ canvas { display: block; }
   <h2>⭐ Купить звёзды</h2>
   <p>Выберите количество:</p>
   <div class="buttons">
-    <p><button>100 ⭐ |  140руб</button></p>
-    <p><button>500 ⭐ |  140руб</button></p>
-    <p><button>1000 ⭐|  140руб</button></p>
+    <p><button onclick="chooseStars(100)">100 ⭐ |  140руб</button></p>
+    <p><button onclick="chooseStars(500)">500 ⭐ |  140руб</button></p>
+    <p><button onclick="chooseStars(1000)">1000 ⭐|  140руб</button></p>
   </div>
+  </div>
+
   <script>
-function buyStars(amount) {
-  if (window.Telegram?.WebApp) {
-    Telegram.WebApp.sendData(amount.toString());
-    Telegram.WebApp.showAlert(`Вы выбрали ${amount} ⭐`);
-  } else {
-    alert(`Вы выбрали ${amount} ⭐`);
-  }
+    // Telegram WebApp
+    Telegram.WebApp.ready();
+
+    function chooseStars(amount) {
+      Telegram.WebApp.sendData(amount.toString());
+      Telegram.WebApp.showAlert(`Вы выбрали ${amount} ⭐`);
+    }
 }
 
 // Привязываем кнопки к функции
