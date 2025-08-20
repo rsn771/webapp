@@ -1,246 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Купить звёзды</title>
-<style>
-body {
-  margin: 0;
-
-  background: #000000;
-  font-family: Impact, sans-serif;
-  color: #fff;
-}
-
-.card {
-  width: 90%;
-  max-width: 650px;
-  margin: 80px auto; /* автоматически центрируем и расстояние между окнами */
-  background: rgba(255,255,255,0.1);
-  border-radius: 40px;
-  padding: 40px 60px;
-  text-align: center;
-  backdrop-filter: blur(10px);
-  z-index: 20;
-}
-
-.card h2 {
-  font-size: 70px;
-  max-font-size: 50px;
-  margin-bottom: 15px;
-}
-
-.card p {
-  font-size: 40px;
-  margin-bottom: 20px;
-}
-
-.buttons button {
-  background: #808080;
-  border: none;
-  color: white;
-  padding: 15px 25px;
-  margin: 10px;
-  border-radius: 30px;
-  cursor: pointer;
-  font-size: 5vw;
-  font-family: "Arial Black", sans-serif;
-}
-
-.buttons button:hover {
-  background: #C0C0C0;
-}
-.card.second {
-  top: calc(10% + 700px +20px); /* 10% от верха + высота первого окна + отступ */
-  left: 50%;
-  transform: translateX(-50%);
-  position: absolute;
-  z-index: 20; /* такой же, как у первого окна */
-}
-.vignette {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 5;
-  background: radial-gradient(circle at var(--vx) var(--vy), rgba(255,255,255,0.25) 50%, rgba(0,0,0,1) 80%);
-  opacity: 0.4; /* фиксированная яркость */
-}
-@keyframes pulse {
-  from { opacity: 0.1; }
-  to   { opacity: 0.9; }
-}
-
-canvas {
-  display: block;
-  position: fixed;   /* фиксируем на весь экран */
-  top: 0;
-  left: 0;
-  z-index: 1;        /* нижний слой */
-}
-
-.vignette {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 5;        /* выше канваса, ниже окон */
-  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.25) 0%, rgba(0,0,0,1) 70%);
-  opacity: 0.7;
-}
-
-.card {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;       }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Покупка звёзд</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+  <h3>Купить звёзды</h3>
+  <input type="number" id="stars" min="1" value="10">
+  <button id="payBtn">Оплатить</button>
+  <div id="status"></div>
 
-<div class="card first">
-  <h2>⭐ Купить звёзды</h2>
-  <p>Выберите количество:</p>
-  <div class="buttons">
-    <p><button onclick="chooseStars(100)">50⭐ |  75руб</button></p>
-    <p><button onclick="chooseStars(500)">100⭐ |  140руб</button></p>
-    <p><button onclick="chooseStars(1000)">500⭐ |  725руб</button></p>
-    <p><button onclick="chooseStars(1000)">1000⭐ |  1350руб</button></p>
-  </div>
-</div>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-<div class="card second">
-  <h2>Почему именно этот сервис?</h2>
-  <p>Быстро и проверенно</p>
-  <p>Гарантия (по квитанции)</p>
-  <p>В случае ошибок @wlked_game</p>
-</div>
+    // Токен тестового аккаунта PayMaster
+    const PAYMASTER_TOKEN = "1744374395:TEST:1a8282597a855bf711c0"; // вставьте ваш тестовый токен
 
-<script>
-const firstCard = document.querySelector('.card.first');
-const secondCard = document.querySelector('.card.second');
+    const payBtn = document.getElementById("payBtn");
+    const starsInput = document.getElementById("stars");
+    const status = document.getElementById("status");
 
-function positionSecondCard() {
-  const rect = firstCard.getBoundingClientRect();
-  secondCard.style.top = rect.bottom + 300 + 'px'; // 20px отступ под первым окном
-}
+    payBtn.addEventListener("click", async () => {
+      const stars = parseInt(starsInput.value, 10);
+      const amount = stars * 1; // цена 1₽ за звезду
 
-positionSecondCard();
-window.addEventListener('resize', positionSecondCard);
-</script>
-<script>
-    // Telegram WebApp
-    Telegram.WebApp.ready();
+      status.textContent = "Создаём счёт...";
 
-    function chooseStars(amount) {
-      Telegram.WebApp.sendData(amount.toString());
-      Telegram.WebApp.showAlert(`Вы выбрали ${amount} ⭐`);
-    }
-}
+      const payload = {
+        externalId: "tg_" + tg.initDataUnsafe.user.id + "_" + Date.now(),
+        amount: { value: amount, currency: "RUB" },
+        description: `Покупка ${stars} звёзд для TG:${tg.initDataUnsafe.user.id}`
+      };
 
-// Привязываем кнопки к функции
-document.getElementById('btn100').addEventListener('click', ()=>buyStars(100));
-document.getElementById('btn500').addEventListener('click', ()=>buyStars(500));
-document.getElementById('btn1000').addEventListener('click', ()=>buyStars(1000));
-</script>
-</div>
+      try {
+        const res = await fetch("https://sandbox.paymaster.ru/api/v2/invoices", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${PAYMASTER_TOKEN}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
 
-<div class="vignette"></div>
+        const data = await res.json();
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
-<script>
-// Сцена и камера
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({alpha: true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Свет
-const light = new THREE.PointLight(0xffffff, 1);
-light.position.set(50, 50, 50);
-scene.add(light);
-scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-
-// Золотой материал
-const goldMaterial = new THREE.MeshStandardMaterial({color: 0xFFD700, metalness:0.8, roughness:0.3});
-
-// Функция создания пятиконечной звезды
-function createStarGeometry(size=1){
-  const shape = new THREE.Shape();
-  const outer = size;
-  const inner = size*0.5;
-  for(let i=0;i<5;i++){
-    let theta = (i*2*Math.PI)/5 - Math.PI/2;
-    let x = outer*Math.cos(theta);
-    let y = outer*Math.sin(theta);
-    if(i===0) shape.moveTo(x,y); else shape.lineTo(x,y);
-    theta += Math.PI/5;
-    x = inner*Math.cos(theta);
-    y = inner*Math.sin(theta);
-    shape.lineTo(x,y);
-  }
-  shape.closePath();
-  const extrudeSettings = {depth:0.2, bevelEnabled:true, bevelThickness:0.05, bevelSize:0.05, bevelSegments:1};
-  return new THREE.ExtrudeGeometry(shape, extrudeSettings);
-}
-const center = new THREE.Vector3(0, 0, 0); // центр сцены, соответствует центру экрана
-// Создаём падающие звезды
-const stars = [];
-for(let i=0;i<40;i++){
-  const geometry = createStarGeometry(0.8 + Math.random()*0.5);
-  const star = new THREE.Mesh(geometry, goldMaterial);
-  star.position.copy(center);
-  const theta = Math.random() * 2 * Math.PI;
-const phi = Math.random() * Math.PI;
-const speed = 0.2 + Math.random()*0.3;
-star.velocity = new THREE.Vector3(
-  speed * Math.sin(phi) * Math.cos(theta),
-  speed * Math.sin(phi) * Math.sin(theta),
-  speed * Math.cos(phi)
-);
-  star.rotationSpeed = Math.random()*0.02;
-  star.fallSpeed = 0.1 + Math.random()*0.3;
-  scene.add(star);
-  stars.push(star);
-}
-
-camera.position.z = 50;
-
-// Анимация
-function animate(){
-  requestAnimationFrame(animate);
-  stars.forEach(star=>{
-    star.rotation.x += star.rotationSpeed;
-    star.rotation.y += star.rotationSpeed;
-    star.position.add(star.velocity);
-if(star.position.length() > 50){
-  star.position.set(0, 0, 0); // возвращаем в центр после выхода за границу
-}
-  });
-  renderer.render(scene, camera);
-}
-animate();
-
-window.addEventListener('resize', ()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-// Центрирование виньетки
-function updateVignetteCenter() {
-  const card = document.querySelector('.card');
-  const rect = card.getBoundingClientRect();
-  const vx = rect.left + rect.width/2;
-  const vy = rect.top + rect.height/2;
-  document.querySelector('.vignette').style.setProperty('--vx', vx+'px');
-  document.querySelector('.vignette').style.setProperty('--vy', vy+'px');
-}
-updateVignetteCenter();
-window.addEventListener('resize', updateVignetteCenter);
-</script>
-
+        if (data.paymentUrl) {
+          status.textContent = "Счёт создан. Переходим к оплате...";
+          window.location.href = data.paymentUrl;
+        } else {
+          status.textContent = "Ошибка создания счёта";
+          console.error(data);
+        }
+      } catch (e) {
+        status.textContent = "Ошибка запроса";
+        console.error(e);
+      }
+    });
+  </script>
 </body>
 </html>
