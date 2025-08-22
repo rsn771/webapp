@@ -45,13 +45,20 @@ payButton.addEventListener('click', async () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ user_id: userId, stars: selectedStars })
 		});
-		if (!response.ok) throw new Error('Ошибка создания платежа');
-		const data = await response.json();
+		const data = await response.json().catch(() => ({}));
+		if (!response.ok || data.success === false) {
+			const reason = data.error || `HTTP ${response.status}`;
+			showStatus(`Ошибка создания платежа: ${reason}`, 'error');
+			console.error('Create invoice error:', data);
+			payButton.disabled = false;
+			return;
+		}
 		if (data.paymentUrl) {
 			showStatus('Перенаправление на страницу оплаты...', 'success');
 			if (tg.openLink) { tg.openLink(data.paymentUrl); } else { window.open(data.paymentUrl, '_blank'); }
 		} else {
-			throw new Error('Не получена ссылка для оплаты');
+			showStatus('Не получена ссылка для оплаты', 'error');
+			payButton.disabled = false;
 		}
 	} catch (error) {
 		console.error('Ошибка:', error);

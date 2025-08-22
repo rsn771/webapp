@@ -45,6 +45,8 @@ async def health_check():
 @app.post("/create_invoice")
 async def create_invoice(req: InvoiceRequest):
 	try:
+		if not Config.PAYMASTER_TOKEN or Config.PAYMASTER_TOKEN.strip() == "":
+			return {"success": False, "error": "PAYMASTER_TOKEN is not configured on server"}
 		payload = {
 			"externalId": f"tg_{req.user_id}_{int(time.time())}",
 			"amount": {"value": str(req.stars), "currency": "RUB"},
@@ -63,18 +65,36 @@ async def create_invoice(req: InvoiceRequest):
 				json=payload,
 				timeout=30.0
 			)
-			if response.status_code != 200:
-				raise Exception(f"PayMaster API error: {response.status_code}")
-			data = response.json()
-			if "paymentUrl" not in data:
-				raise Exception("Payment URL not received from PayMaster")
+			status_ok = response.status_code in (200, 201)
+			resp_text = response.text
+			if not status_ok:
+				return {
+					"success": False,
+					"error": f"PayMaster API error",
+					"status": response.status_code,
+					"body": resp_text
+				}
+			try:
+				data = response.json()
+			except Exception:
+				return {"success": False, "error": "Invalid JSON from PayMaster", "body": resp_text}
+			payment_url = (
+				data.get("paymentUrl")
+				or data.get("confirmationUrl")
+				or data.get("url")
+				or (data.get("links", {}) or {}).get("paymentUrl")
+			)
+			if not payment_url:
+				return {"success": False, "error": "Payment URL not received", "data": data}
 			return {
 				"success": True,
-				"paymentUrl": data["paymentUrl"],
-				"invoice_id": data.get("id"),
+				"paymentUrl": payment_url,
+				"invoice_id": data.get("id") or data.get("invoiceId"),
 				"amount": req.stars,
 				"currency": "RUB"
 			}
+	except httpx.RequestError as e:
+		return {"success": False, "error": f"Network error: {e}"}
 	except Exception as e:
 		return {"success": False, "error": str(e)}
 
@@ -101,7 +121,7 @@ async def get_payment_status(invoice_id: str):
 				},
 				timeout=30.0
 			)
-			if response.status_code == 200:
+			if response.status_code in (200, 201):
 				data = response.json()
 				return {
 					"success": True,
@@ -110,7 +130,7 @@ async def get_payment_status(invoice_id: str):
 					"paid_at": data.get("paidAt")
 				}
 			else:
-				return {"success": False, "error": f"Status check failed: {response.status_code}"}
+				return {"success": False, "error": f"Status check failed", "status": response.status_code, "body": response.text}
 	except Exception as e:
 		return {"success": False, "error": str(e)}
 
