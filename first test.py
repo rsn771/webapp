@@ -18,7 +18,7 @@ async def start(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text="⭐ Купить звёзды",
-            web_app=WebAppInfo(url="http://localhost:63342/111/mini%20app%20tg/index.html?_ijt=29jsqbcad8dltfseru2t0atctd&_ij_reload=RELOAD_ON_SAVE")  # тут будет твой мини-сайт
+            web_app=WebAppInfo(url="https://webapp-delta-puce.vercel.app/")  # прод-домен мини-приложения
         )]
     ])
     await message.answer("Привет! Это мини-приложение для покупки звёзд:", reply_markup=keyboard)
