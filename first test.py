@@ -6,7 +6,10 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.filters import Command
 import os
 
-API_TOKEN = "8302025614:AAEJPgUpyaldKm25JKvyebDC7ekxFBoIp9A"  # токен бота от @BotFather
+# Токен бота из ENV (обязательно), хардкод убран
+API_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not API_TOKEN:
+    raise RuntimeError("TELEGRAM_BOT_TOKEN is not set")
 
 # URL мини-приложения из ENV, с безопасным дефолтом
 WEBAPP_URL = os.getenv(
