@@ -34,6 +34,39 @@ class PaymentNotification(BaseModel):
 	amount: float
 	currency: str
 
+
+def _find_url_in_obj(obj):
+	"""Best-effort search for first http(s) URL in dict/list/str."""
+	try:
+		if obj is None:
+			return None
+		if isinstance(obj, str):
+			return obj if obj.startswith("http://") or obj.startswith("https://") else None
+		if isinstance(obj, list):
+			for item in obj:
+				url = _find_url_in_obj(item)
+				if url:
+					return url
+			return None
+		if isinstance(obj, dict):
+			# check common keys first
+			for key in [
+				"paymentUrl", "confirmationUrl", "redirectUrl", "payUrl", "url", "link", "href"
+			]:
+				if key in obj:
+					url = _find_url_in_obj(obj.get(key))
+					if url:
+						return url
+			# check links arrays or nested objects
+			for k, v in obj.items():
+				url = _find_url_in_obj(v)
+				if url:
+					return url
+			return None
+		return None
+	except Exception:
+		return None
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
 	return FileResponse(os.path.join(STATIC_DIR, "index.html"))
@@ -78,12 +111,7 @@ async def create_invoice(req: InvoiceRequest):
 				data = response.json()
 			except Exception:
 				return {"success": False, "error": "Invalid JSON from PayMaster", "body": resp_text}
-			payment_url = (
-				data.get("paymentUrl")
-				or data.get("confirmationUrl")
-				or data.get("url")
-				or (data.get("links", {}) or {}).get("paymentUrl")
-			)
+			payment_url = _find_url_in_obj(data)
 			if not payment_url:
 				return {"success": False, "error": "Payment URL not received", "data": data}
 			return {
