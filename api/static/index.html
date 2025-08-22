@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Платежное миниприложение</title>
+	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+	<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>💳 Платежное приложение</h1>
+			<p>Выберите количество звезд для покупки</p>
+		</div>
+		<div class="stars-container">
+			<div class="star-option" data-stars="10">
+				<div class="star-icon">⭐</div>
+				<div class="star-count">10 звезд</div>
+				<div class="star-price">10 ₽</div>
+			</div>
+			<div class="star-option" data-stars="25">
+				<div class="star-icon">⭐⭐</div>
+				<div class="star-count">25 звезд</div>
+				<div class="star-price">25 ₽</div>
+			</div>
+			<div class="star-option" data-stars="50">
+				<div class="star-icon">⭐⭐⭐</div>
+				<div class="star-count">50 звезд</div>
+				<div class="star-price">50 ₽</div>
+			</div>
+			<div class="star-option" data-stars="100">
+				<div class="star-icon">⭐⭐⭐⭐</div>
+				<div class="star-count">100 звезд</div>
+				<div class="star-price">100 ₽</div>
+			</div>
+		</div>
+		<div class="selected-info" id="selectedInfo" style="display: none;">
+			<div class="selected-stars">
+				<span id="selectedCount">0</span> звезд
+			</div>
+			<div class="selected-price">
+				<span id="selectedPrice">0</span> ₽
+			</div>
+		</div>
+		<button class="pay-button" id="payButton" disabled>💳 Оплатить</button>
+		<div class="status" id="status"></div>
+	</div>
+	<script src="/static/app.js"></script>
+</body>
+</html>

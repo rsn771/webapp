@@ -2,8 +2,7 @@
   "version": 2,
   "functions": {
     "api/index.py": {
-      "runtime": "python3.11",
-      "includeFiles": ["static/**", "main.py", "config.py"]
+      "runtime": "python3.11"
     }
   },
   "rewrites": [
