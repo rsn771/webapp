@@ -162,6 +162,24 @@ async def get_payment_status(invoice_id: str):
 	except Exception as e:
 		return {"success": False, "error": str(e)}
 
+@app.get("/net_test")
+async def net_test():
+	results = {}
+	try:
+		async with httpx.AsyncClient(timeout=10.0) as client:
+			# test public endpoint
+			resp1 = await client.get("https://httpbin.org/get")
+			results["httpbin_status"] = resp1.status_code
+			# test PayMaster base (HEAD/GET)
+			resp2 = await client.get(Config.PAYMASTER_URL.split("/api")[0], follow_redirects=True)
+			results["paymaster_base_status"] = resp2.status_code
+			# test PayMaster invoices (likely 405/401 but reachable)
+			resp3 = await client.get(Config.PAYMASTER_URL, headers={"Authorization": f"Bearer {Config.PAYMASTER_TOKEN}"})
+			results["paymaster_invoices_status"] = resp3.status_code
+	except Exception as e:
+		results["error"] = str(e)
+	return {"results": results, "env": {"PAYMASTER_URL": Config.PAYMASTER_URL[:60] + "...", "has_TOKEN": bool(Config.PAYMASTER_TOKEN)}}
+
 if __name__ == "__main__":
 	import uvicorn
 	uvicorn.run(app, host="0.0.0.0", port=8000)
