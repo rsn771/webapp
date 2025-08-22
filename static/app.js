@@ -83,11 +83,12 @@ payButton.addEventListener('click', async () => {
         if (data.paymentUrl) {
             showStatus('Перенаправление на страницу оплаты...', 'success');
             
-            // Открываем страницу оплаты
-            tg.openTelegramLink(data.paymentUrl);
-            
-            // Альтернативно можно открыть в новом окне
-            // window.open(data.paymentUrl, '_blank');
+            // Открываем страницу оплаты (внешняя ссылка)
+            if (tg.openLink) {
+                tg.openLink(data.paymentUrl);
+            } else {
+                window.open(data.paymentUrl, '_blank');
+            }
         } else {
             throw new Error('Не получена ссылка для оплаты');
         }
