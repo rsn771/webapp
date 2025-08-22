@@ -20,8 +20,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Абсолютные пути для статики
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
 # Подключение статических файлов
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Модели данных
 class InvoiceRequest(BaseModel):
@@ -38,7 +42,7 @@ class PaymentNotification(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     """Главная страница миниприложения"""
-    return FileResponse("static/index.html")
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 @app.get("/health")
 async def health_check():
@@ -51,11 +55,11 @@ async def create_invoice(req: InvoiceRequest):
     try:
         payload = {
             "externalId": f"tg_{req.user_id}_{int(time.time())}",
-            "amount": {"value": req.stars, "currency": "RUB"},
+            "amount": {"value": str(req.stars), "currency": "RUB"},
             "description": f"Покупка {req.stars} звёзд для пользователя TG:{req.user_id}",
-            "successUrl": "https://t.me/payment_stars_bot",  # URL вашего бота
-            "failUrl": "https://t.me/payment_stars_bot",     # URL вашего бота
-            "expirationDateTime": int(time.time()) + 3600,  # Счет действителен 1 час
+            "successUrl": "https://t.me/payment_stars_bot",
+            "failUrl": "https://t.me/payment_stars_bot",
+            "expirationDateTime": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + 3600))
         }
         
         async with httpx.AsyncClient() as client:
