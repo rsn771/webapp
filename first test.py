@@ -37,6 +37,22 @@ async def start(message: types.Message):
 async def refresh(message: types.Message):
     await start(message)
 
+# /url — показать текущий URL
+@dp.message(Command("url"))
+async def show_url(message: types.Message):
+    await message.answer(f"WEBAPP_URL: {WEBAPP_URL}")
+
+# /menu — принудительно обновить кнопку меню
+@dp.message(Command("menu"))
+async def set_menu(message: types.Message):
+    try:
+        await bot.set_chat_menu_button(
+            menu_button=types.MenuButtonWebApp(text="Открыть приложение", web_app=WebAppInfo(url=WEBAPP_URL))
+        )
+        await message.answer("Кнопка меню обновлена")
+    except Exception as e:
+        await message.answer(f"Ошибка обновления меню: {e}")
+
 async def main():
     # Обновляем кнопку меню на новый WebApp URL
     try:
