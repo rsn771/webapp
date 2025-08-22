@@ -32,7 +32,21 @@ async def start(message: types.Message):
     ])
     await message.answer("Привет! Это мини-приложение для покупки звёзд:", reply_markup=keyboard)
 
+# /refresh — отправить новую кнопку ещё раз
+@dp.message(Command("refresh"))
+async def refresh(message: types.Message):
+    await start(message)
+
 async def main():
+    # Обновляем кнопку меню на новый WebApp URL
+    try:
+        await bot.set_chat_menu_button(
+            menu_button=types.MenuButtonWebApp(text="Открыть приложение", web_app=WebAppInfo(url=WEBAPP_URL))
+        )
+        logging.info("Chat menu button updated via API")
+    except Exception as e:
+        logging.error(f"Failed to set chat menu button: {e}")
+
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
