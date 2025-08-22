@@ -20,8 +20,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Абсолютные пути для статики
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
 # Подключение статических файлов
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Модели данных
 class InvoiceRequest(BaseModel):
@@ -38,7 +42,7 @@ class PaymentNotification(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     """Главная страница миниприложения"""
-    return FileResponse("static/index.html")
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 @app.get("/health")
 async def health_check():
