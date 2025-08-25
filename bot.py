@@ -22,14 +22,14 @@ def make_step1_keyboard() -> InlineKeyboardMarkup:
 
 def make_step2_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="Показать фото и код", callback_data="go_step2")]]
+        inline_keyboard=[[InlineKeyboardButton(text="Далее", callback_data="go_step2")]]
     )
 
 
 @router.message(CommandStart())
 async def handle_start(message: Message) -> None:
     await message.answer(
-        "Привет! Нажми кнопку ниже, чтобы продолжить.",
+        "Привет Рома, хоть ты и на данный момент не интересуешься криптой, технологиями и тд. я считаю лишним в наше время это точно не будет. Я уверен что когда нибудь ты точно найдешь этому применение ",
         reply_markup=make_step1_keyboard(),
     )
 
@@ -46,7 +46,7 @@ async def handle_step1(callback: CallbackQuery, bot: Bot) -> None:
         pass
 
     await callback.message.answer(
-        "Шаг 2. Нажми кнопку ниже, чтобы получить фото и код.",
+        "Поскольку в ближайшее время тебе врядли понадобится использовать крипту, я посчитал что биткоин будет лучшим вариантом. Чем дольше лежит- тем больше растет, биткоин рано или поздно всегда поднимается вверх, поэтому этот актив хорошо подойдет под тебя",
         reply_markup=make_step2_keyboard(),
     )
     await callback.answer()
@@ -55,6 +55,12 @@ async def handle_step1(callback: CallbackQuery, bot: Bot) -> None:
 @router.callback_query(F.data == "go_step2")
 async def handle_step2(callback: CallbackQuery) -> None:
     await callback.answer()
+
+    # Удаляем предыдущее сообщение с кнопкой перед отправкой фото и кода
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
 
     photo = URLInputFile("https://picsum.photos/seed/telegram-bot/900/500")
     await callback.message.answer_photo(photo=photo, caption="Вот ваше изображение")
